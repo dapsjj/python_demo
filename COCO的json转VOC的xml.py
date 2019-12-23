@@ -7,6 +7,21 @@ import matplotlib.pyplot as plt
 import cv2
 from PIL import Image, ImageDraw
 
+
+#目录结构
+#datasets
+#  |COCO
+#     |annotations 
+#         |instances_train2017.json
+#     |result
+#         |Annotations(空)
+#         |images(空)
+#         |train2017
+#             |000000000009.jpg
+#             |000000000025.jpg
+#             |000000000030.jpg
+
+
 #the path you want to save your results for coco to voc
 savepath="E:/datasets/COCO/result/"
 # img_dir=savepath+'images/'
