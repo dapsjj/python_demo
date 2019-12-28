@@ -17,10 +17,18 @@ FLAGS = flags.FLAGS
 
 # TO-DO replace this with label map
 def class_text_to_int(row_label):
-    if row_label == 'side':
+    if row_label == 'car':
         return 1
-    elif row_label == 'vehicle':
+    elif row_label == 'bicycle':
         return 2
+    elif row_label == 'person':
+        return 3
+    elif row_label == 'motorcycle':
+        return 4
+    elif row_label == 'bus':
+        return 5
+    elif row_label == 'truck':
+        return 6
     else:
         None
 
@@ -74,7 +82,7 @@ def create_tf_example(group, path):
 
 def main(_):
     writer = tf.python_io.TFRecordWriter(FLAGS.output_path)
-    path = os.path.join(os.getcwd(), 'images/train')
+    path = os.path.join(os.getcwd(), 'images/train')#使用python generate_TFR.py --csv_input=data/test.csv --output_path=data/test.record时需要改成path = os.path.join(os.getcwd(), 'images/test')
     examples = pd.read_csv(FLAGS.csv_input)
     grouped = split(examples, 'filename')
     for group in grouped:
