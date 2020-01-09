@@ -29,7 +29,19 @@ def xml_to_txt(path):
         # everyrow_xml_list.append(int(root.find('size')[0].text))#图片宽
         # everyrow_xml_list.append(int(root.find('size')[1].text))#图片高
         for member in root.findall('object'):
-            value = str(int(member[4][0].text))+','+str(int(member[4][1].text))+','+str(int(member[4][2].text))+','+str(int(member[4][3].text))+','+member[0].text
+            xmin = str(int(member[4][0].text))
+            ymin = str(int(member[4][1].text))
+            xmax = str(int(member[4][2].text))
+            ymax = str(int(member[4][3].text))
+            if xmin=="0":
+                xmin="1"
+            if ymin=="0":
+                ymin="1"
+            if xmax=="0":
+                xmax="1"
+            if ymax=="0":
+                ymax="1"
+            value = xmin+','+ymin+','+xmax+','+ymax+','+member[0].text
             everyrow_xml_list.append(value)
         txt_list.append(everyrow_xml_list)#image_path x_min,y_min,x_max,y_max,class_id  x_min,y_min,x_max,y_max,class_id ……
     return txt_list
