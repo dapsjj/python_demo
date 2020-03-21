@@ -18,10 +18,15 @@ for thisImage in img_files:
         ssim = compare_ssim(img, img1, multichannel=True)
         # print(thisImage,item,ssim)
         if ssim > 0.9:
-            repeatList.append(item)
+            repeatList.append([item,thisImage])
             info=item+ '与' + thisImage + '可能重复'
+            repeatList.append(info)
             print(info)
-print(repeatList)
+
+a = set(tuple(sorted(l)) for l in repeatList)
+b = [list(i) for i in a]
+b.sort()
+
 with open(r'D:/bbb.txt', 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f, delimiter=' ')
-    writer.writerows(repeatList)
+    writer.writerows(b)
