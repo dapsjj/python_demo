@@ -2,7 +2,7 @@ import os
 import cv2
 from xml.dom import minidom
 
-testImagesPath = r'E:\test_opencv\tensorflow-yolov3-master_for_12_garbage\data\dataset\test'
+testImagesPath = r'E:\test_opencv\tensorflow-yolov3-master_for_12_garbage\data\dataset\train'
 testList=os.listdir(testImagesPath)
 for test in testList:
     if test.endswith('.jpg'):
@@ -15,4 +15,4 @@ for test in testList:
         xml_width=int(doc.getElementsByTagName('width')[0].firstChild.nodeValue)
         xml_height=int(doc.getElementsByTagName('height')[0].firstChild.nodeValue)
         if image_height!=xml_height or image_weight!=xml_width:
-            print(testImagesPath+'\\'+test)
+            print(testImagesPath+'\\'+test,xml_width,xml_height)
