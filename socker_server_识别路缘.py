@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-# coding=utf-8
+# -*- coding: UTF-8 -*-
 
 import cv2
 import time
@@ -10,6 +9,7 @@ from PIL import Image
 import socket
 import pickle
 import struct
+import decision
 
 HOST = '127.0.0.1'
 PORT = 8485
@@ -24,6 +24,9 @@ num_classes     = 1
 input_size      = 416
 graph           = tf.Graph()
 return_tensors  = utils.read_pb_return_tensors(graph, pb_file, return_elements)
+# 计数器
+counter = 0
+minAreaList = []
 
 with tf.Session(graph=graph) as sess:
 
@@ -36,18 +39,19 @@ with tf.Session(graph=graph) as sess:
     clientsocket, addr = socketserver.accept()
     data = b""
     payload_size = struct.calcsize(">L")
-    print("payload_size: {}".format(payload_size))
+    # print("payload_size: {}".format(payload_size))
     while True:
         while len(data) < payload_size:
-            print("Recv: {}".format(len(data)))
+            # print("Recv: {}".format(len(data)))
             data += clientsocket.recv(4096)
-        print("Done Recv: {}".format(len(data)))
+        # print("Done Recv: {}".format(len(data)))
         packed_msg_size = data[:payload_size]
         data = data[payload_size:]
         msg_size = struct.unpack(">L", packed_msg_size)[0]
-        print("msg_size: {}".format(msg_size))
+        # print("msg_size: {}".format(msg_size))
         while len(data) < msg_size:
             data += clientsocket.recv(4096)
+
         frame_data = data[:msg_size]
         data = data[msg_size:]
         frame = pickle.loads(frame_data, fix_imports=True, encoding="bytes")
@@ -73,10 +77,33 @@ with tf.Session(graph=graph) as sess:
         # bboxes :xmin, ymin, xmax, ymax, score, class
         strPositio = ''
         if bboxes:
+            counter += 1
+            # print('counter:'+str(counter))
+            allAreaList=[]
             for row in bboxes:
                 xmin, ymin, xmax, ymax = row[:4]
-                strPositio += str(int(xmin)) + ',' + str(int(ymin)) + ',' + str(int(xmax)) + ',' + str(int(ymax)) + ';'
-            print(strPositio[:-1])  # 打印路缘坐标，为socket通信用
+                width = xmax-xmin
+                height = ymax-ymin
+                area = width * height
+                allAreaList.append(area)
+                strPositio += str(int(xmin)) + ',' + str(int(ymin)) + ',' + str(int(xmax)) + ',' + str(int(ymax)) + ',' + str(int(area)) + ';'
+            minArea = min(allAreaList)
+            minAreaList.append(minArea)
+            if counter % 10 == 0:
+                averageArea = np.mean(minAreaList)
+                minAreaList = []
+                directtion, speed = decision.directionSpeedAdjustmen(averageArea)
+                strPositio += str(directtion) + ',' + str(speed)
+                # print(strPositio)  # 打印路缘坐标，为socket通信用，比如：300,197,621,272,24100;0,204,257,283,20238;0,2(x1min,y1min,x1max,y1max,area1;x2min,y2min,x2max,y2max,area2;directtion,speed)
+            else:
+                strPositio = 'None'
+
+        msg = strPositio
+        if not msg:
+            msg = 'None'
+        # 对要发送的数据进行编码
+        print('消息是：' + msg)
+        clientsocket.send(msg.encode("utf-8"))  # TypeError: a bytes-like object is required, not 'list',不要传list,会出错
 
         image = utils.draw_bbox(frame, bboxes)
         result = np.asarray(image)
@@ -84,12 +111,7 @@ with tf.Session(graph=graph) as sess:
         cv2.imshow("result", result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        msg = strPositio
-        if not msg:
-            msg='None'
-        # 对要发送的数据进行编码
-        print('消息是：'+msg)
-        clientsocket.send(msg.encode("utf-8"))
+        cv2.destroyAllWindows()
 
 
 
