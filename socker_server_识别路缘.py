@@ -25,8 +25,8 @@ input_size      = 416
 graph           = tf.Graph()
 return_tensors  = utils.read_pb_return_tensors(graph, pb_file, return_elements)
 # 计数器
-counter = 0
-minAreaList = []
+boxCounter = 0 #有目标的帧的数量
+frameCounter = 0 #全部帧的数量
 
 with tf.Session(graph=graph) as sess:
 
@@ -76,9 +76,9 @@ with tf.Session(graph=graph) as sess:
 
         # bboxes :xmin, ymin, xmax, ymax, score, class
         strPositio = ''
+        frameCounter += 1 #每从client获取一张图片,则+1
         if bboxes:
-            counter += 1
-            # print('counter:'+str(counter))
+            # boxCounter += 1
             allAreaList=[]
             for row in bboxes:
                 xmin, ymin, xmax, ymax = row[:4]
@@ -88,22 +88,19 @@ with tf.Session(graph=graph) as sess:
                 allAreaList.append(area)
                 strPositio += str(int(xmin)) + ',' + str(int(ymin)) + ',' + str(int(xmax)) + ',' + str(int(ymax)) + ',' + str(int(area)) + ';'
             minArea = min(allAreaList)
-            minAreaList.append(minArea)
-            if counter % 10 == 0:
-                averageArea = np.mean(minAreaList)
-                minAreaList = []
-                directtion, speed = decision.directionSpeedAdjustmen(averageArea)
-                strPositio += str(directtion) + ',' + str(speed)
-                # print(strPositio)  # 打印路缘坐标，为socket通信用，比如：300,197,621,272,24100;0,204,257,283,20238;0,2(x1min,y1min,x1max,y1max,area1;x2min,y2min,x2max,y2max,area2;directtion,speed)
-            else:
-                strPositio = 'None'
+            directtion, speed = decision.directionSpeedAdjustmen(minArea)
+            strPositio += str(directtion) + ',' + str(speed)
+            # print(strPositio)  # 打印路缘坐标，为socket通信用，比如：300,197,621,272,24100;0,204,257,283,20238;0,2(x1min,y1min,x1max,y1max,area1;x2min,y2min,x2max,y2max,area2;directtion,speed)
+        else: #没有边框
+            strPositio=''
 
-        msg = strPositio
-        if not msg:
-            msg = 'None'
-        # 对要发送的数据进行编码
-        print('消息是：' + msg)
-        clientsocket.send(msg.encode("utf-8"))  # TypeError: a bytes-like object is required, not 'list',不要传list,会出错
+        if frameCounter % 10 == 0: #每10帧发送给client一次消息
+            msg = strPositio
+            if not msg:
+                msg = 'None'
+            # 对要发送的数据进行编码
+            print('消息是：' + msg)
+            clientsocket.send(msg.encode("utf-8"))  # TypeError: a bytes-like object is required, not 'list',不要传list,会出错
 
         image = utils.draw_bbox(frame, bboxes)
         result = np.asarray(image)
@@ -111,8 +108,6 @@ with tf.Session(graph=graph) as sess:
         cv2.imshow("result", result)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        cv2.destroyAllWindows()
-
-
+    cv2.destroyAllWindows()
 
 
