@@ -23,8 +23,8 @@ y_train = np_utils.to_categorical(encoded_y)
 class MyModel(nn.Module):
     def __init__(self):
         super(MyModel, self).__init__()
-        self.fc1 = nn.Linear(153, 10)
-        self.fc2 = nn.Linear(10, 2)
+        self.fc1 = nn.Linear(153, 10) #输入153，输出10
+        self.fc2 = nn.Linear(10, 2) #输入10，输出2
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
