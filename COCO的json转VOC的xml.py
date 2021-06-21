@@ -2,38 +2,21 @@ from pycocotools.coco import COCO
 import os
 import shutil
 from tqdm import tqdm
-import skimage.io as io
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image, ImageDraw
 
 
-#目录结构
-#datasets
-#  |COCO
-#     |annotations 
-#         |instances_train2017.json
-#     |result
-#         |Annotations(空)
-#         |images(空)
-#         |train2017
-#             |000000000009.jpg
-#             |000000000025.jpg
-#             |000000000030.jpg
-
-
 #the path you want to save your results for coco to voc
-savepath="E:/datasets/COCO/result/"
-# img_dir=savepath+'images/'
+savepath=r"F:/COCO_truck/"
 img_dir=savepath+'images/'
-anno_dir=savepath+'Annotations/'
+anno_dir=savepath+'annotations/'
 # datasets_list=['train2014', 'val2014']
 datasets_list=['train2017']
 
-classes_names = ['car', 'bicycle', 'person', 'motorcycle', 'bus', 'truck']
-#Store annotations and train2014/val2014/... in this folder
-dataDir= 'E:/datasets/COCO/'
-imgDir='resule/images'
+# classes_names = ['car', 'bicycle', 'person', 'motorcycle', 'bus', 'truck']
+classes_names = ['truck']
+dataDir= r'F:/train2017/'
 
 headstr = """\
 <annotation>
@@ -98,10 +81,10 @@ def write_xml(anno_path,head, objs, tail):
     f.write(tail)
 
 
-def save_annotations_and_imgs(coco,dataset,filename,objs):
+def save_annotations_and_imgs(coco,filename,objs):
     #eg:COCO_train2014_000000196610.jpg-->COCO_train2014_000000196610.xml
     anno_path=anno_dir+filename[:-3]+'xml'
-    img_path=dataDir+dataset+'/'+filename
+    img_path=dataDir+'/'+filename
     print(img_path)
     dst_imgpath=img_dir+filename
 
@@ -118,7 +101,7 @@ def save_annotations_and_imgs(coco,dataset,filename,objs):
 
 def showimg(coco,dataset,img,classes,cls_id,show=True):
     global dataDir
-    I=Image.open('%s/%s/%s'%(dataDir,dataset,img['file_name']))
+    I=Image.open('%s/%s'%(dataDir,img['file_name']))
     #通过id，得到注释的信息
     annIds = coco.getAnnIds(imgIds=img['id'], catIds=cls_id, iscrowd=None)
     # print(annIds)
@@ -150,7 +133,7 @@ def showimg(coco,dataset,img,classes,cls_id,show=True):
 
 for dataset in datasets_list:
     #./COCO/annotations/instances_train2014.json
-    annFile='{}/annotations/instances_{}.json'.format(dataDir,dataset)
+    annFile=r'F:/annotations/instances_train2017.json'
 
     #COCO API for initializing annotated data
     coco = COCO(annFile)
@@ -178,6 +161,6 @@ for dataset in datasets_list:
             img = coco.loadImgs(imgId)[0]
             filename = img['file_name']
             # print(filename)
-            objs=showimg(coco, 'result/train2017', img, classes,classes_ids,show=False)
+            objs=showimg(coco, 'xxx', img, classes,classes_ids,show=False)
             print(objs)
-            save_annotations_and_imgs(coco, 'result/train2017', filename, objs)
+            save_annotations_and_imgs(coco, filename, objs)
