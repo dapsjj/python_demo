@@ -214,7 +214,7 @@ def run(weights='yolov5s.pt',  # model.pt path(s)
                 image_x_center = int(width/2)
                 image_y_center = int(height/2)
 
-                #取所有人的坐标框中面积最大的一个局新光
+                #取所有人的坐标框中面积最大的一个矩形框
                 max_area = 0
                 for item in person_coordinate_leftTop_and_rightBottom:
                     rect_width = item[2] - item[0]
