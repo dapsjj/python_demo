@@ -1,13 +1,15 @@
-import PIL.Image
+import cv2
 import os
 
-path = r'C:/Users/eseen_new/Desktop/20220611all_dirty_water'
-images = [os.path.join(path,item) for item in os.listdir(path)]
+src_path = r'C:/Users/Administrator/Desktop/1'
+dst_path = r'C:/Users/Administrator/Desktop/2'
+images = [item for item in os.listdir(src_path)]
 for item in images:
     try:
-        rgba_image = PIL.Image.open(item)
-        rgb_image = rgba_image.convert('RGB')
-        rgb_image.save(item)
+        bgra_image = cv2.imread(os.path.join(src_path,item))
+        bgr_image = cv2.cvtColor(bgra_image,cv2.COLOR_BGRA2BGR)
+        img_name = os.path.join(dst_path,item)
+        cv2.imwrite(img_name,bgr_image)
     except Exception as ex:
         print(item)
         continue
