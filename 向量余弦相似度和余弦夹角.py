@@ -53,11 +53,11 @@ for (colname, colval) in df_compare_data.iteritems():
     # print(colname, colval.values)
     np_array_this = np.array(colval)
     vector_this = np_array_this / np.linalg.norm(np_array_this)
-    dot_product = np.dot(vector_standard, vector_this)
-    radian = np.arccos(dot_product)  # 弧度3.14是180度,1.57是90度
+    dot_vector = np.dot(vector_standard, vector_this)
+    radian = np.arccos(dot_vector)  # 弧度3.14是180度,1.57是90度
     # print('弧度：' + str(radian))
     angle = np.degrees(radian)  # 角度
-    print('列名：' + colname, ',余弦角度：' + str(angle))
+    print('列名：' + colname, ',余弦角度：' + str(angle),'余弦值：' + str(dot_vector))
     company_name_and_cosine_angle.append([colname, angle])
 
 result_df = pd.DataFrame(company_name_and_cosine_angle, columns=['企业名称', '余弦角度'])
