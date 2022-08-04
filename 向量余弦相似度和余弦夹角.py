@@ -33,34 +33,41 @@ print('角度：'+str(angle))
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
+import glob
+import os
 
-df = pd.read_csv(r'溯源结果.csv', encoding='utf-8', header=0)
-df.fillna(value=0, inplace=True)
+save_csv_path = r'./结果'
+for filename in glob.glob(r'./丰度百分比/*.csv'):
+    (_, f_name) = os.path.split(filename)
+    (f_shortname, _) = os.path.splitext(f_name)
+    df = pd.read_csv(filename, encoding='utf-8', header=0)
+    df.fillna(value=0, inplace=True)
 
-# 归一化
-'''
-min_max_scaler = preprocessing.MinMaxScaler()
-df[:] = min_max_scaler.fit_transform(df)
-df = pd.DataFrame(df)
-'''
+    # 归一化
+    '''
+    min_max_scaler = preprocessing.MinMaxScaler()
+    df[:] = min_max_scaler.fit_transform(df)
+    df = pd.DataFrame(df)
+    '''
 
-df_compare_data = df.iloc[:, 2:]  # df.iloc[:, 2:].copy()避免修改df1时影响df,获取第三列之后的列
-df_standard = df.iloc[:, 1]  # 获取混合水样,df.iloc[:, 1]得到的是series,df.iloc[:, 1:2]得到的是dataframe
-np_array_standard = np.array(df_standard)
-vector_standard = np_array_standard / np.linalg.norm(np_array_standard)
-company_name_and_cosine_angle = []  # 企业名称、余弦角度
-for (colname, colval) in df_compare_data.iteritems():
-    # print(colname, colval.values)
-    np_array_this = np.array(colval)
-    vector_this = np_array_this / np.linalg.norm(np_array_this)
-    dot_vector = np.dot(vector_standard, vector_this)
-    radian = np.arccos(dot_vector)  # 弧度3.14是180度,1.57是90度
-    # print('弧度：' + str(radian))
-    angle = np.degrees(radian)  # 角度
-    print('列名：' + colname, ',余弦角度：' + str(angle),'余弦值：' + str(dot_vector))
-    company_name_and_cosine_angle.append([colname, angle])
+    df_compare_data = df.iloc[:, 2:]  # df.iloc[:, 2:].copy()避免修改df1时影响df,获取第三列之后的列
+    df_standard = df.iloc[:, 1]  # 获取混合水样,df.iloc[:, 1]得到的是series,df.iloc[:, 1:2]得到的是dataframe
+    np_array_standard = np.array(df_standard)
+    vector_standard = np_array_standard / np.linalg.norm(np_array_standard)
+    company_name_and_cosine_angle = []  # 企业名称、余弦角度
+    for (colname, colval) in df_compare_data.iteritems():
+        # print(colname, colval.values)
+        np_array_this = np.array(colval)
+        vector_this = np_array_this / np.linalg.norm(np_array_this)
+        dot_vector = np.dot(vector_standard, vector_this)
+        radian = np.arccos(dot_vector)  # 弧度3.14是180度,1.57是90度
+        # print('弧度：' + str(radian))
+        angle = np.degrees(radian)  # 角度
+        print('列名：' + colname, ',余弦角度：' + str(angle),'余弦值：' + str(dot_vector))
+        company_name_and_cosine_angle.append([colname, angle])
 
-result_df = pd.DataFrame(company_name_and_cosine_angle, columns=['企业名称', '余弦角度'])
-result_df = result_df.sort_values(by=['余弦角度'], ascending=[True])
-result_df.to_csv('结果.csv', index=False, mode='w', header=True, encoding='utf-8')
+    result_df = pd.DataFrame(company_name_and_cosine_angle, columns=['企业名称', '余弦角度'])
+    result_df = result_df.sort_values(by=['余弦角度'], ascending=[True])
+    result_df.to_csv(os.path.join(save_csv_path,f_shortname+'.csv'), index=False, mode='w', header=True, encoding='utf-8')
+
 
