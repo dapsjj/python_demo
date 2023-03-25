@@ -1,0 +1,16 @@
+启动Docker Desktop
+docker login #登录
+docker images #查看有哪些镜像
+docker stop <容器id> #停止容器
+docker ps #查看正在运行的容器
+docker rmi flask_app_yolov5_henan #删除镜像
+docker container prune #删除所有已停止的容器
+cd C:/Users/Administrator/Desktop/yolov5-6.2 #进入目录
+docker build -t flask_app_yolov5_henan . #构建镜像
+docker run -d -p 8081:8081 -v D:/bbb:/usr/src/app/image -v D:/aaa:/usr/src/app/result flask_app_yolov5_henan #运行容器1(有挂载)
+docker start <CONTAINER ID or NAME> #重新启动已经运行过的容器，不产生新的容器
+docker run -d -p 8081:8081 flask_app_yolov5_henan #运行容器2(无挂载)
+可以使用 docker exec -it <container-id> /bin/bash 命令进入容器的 Bash 终端
+测试：http://127.0.0.1:8081/vision?model=Person&source=/usr/src/app/image/21_Festival_Festival_21_361.jpg
+拷贝到本地：docker cp <容器id>:/usr/src/app/runs/detect/exp/. D:/aaa
+拷贝到容器：docker cp C:/Users/Administrator/Desktop/yolov5-6.2/. <容器id>:/usr/src/app/
