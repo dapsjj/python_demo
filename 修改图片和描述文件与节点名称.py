@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from natsort import natsorted
 
 
-currentPath= r'C:/Users/dapsj/Desktop/新建文件夹' #路径名
+currentPath= r'C:/Users/123/Desktop/新建文件夹' #路径名
 
 print('currentPath:'+currentPath)
 pre = 'water_20230425_'
