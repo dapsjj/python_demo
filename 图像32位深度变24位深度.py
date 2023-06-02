@@ -1,15 +1,24 @@
-import cv2
+from PIL import Image
 import os
 
-src_path = r'C:/Users/Administrator/Desktop/1'
-dst_path = r'C:/Users/Administrator/Desktop/2'
-images = [item for item in os.listdir(src_path)]
-for item in images:
-    try:
-        bgra_image = cv2.imread(os.path.join(src_path,item))
-        bgr_image = cv2.cvtColor(bgra_image,cv2.COLOR_BGRA2BGR)
-        img_name = os.path.join(dst_path,item)
-        cv2.imwrite(img_name,bgr_image)
-    except Exception as ex:
-        print(item)
-        continue
+folder_path = "path/to/folder"  # 文件夹路径
+
+# 获取文件夹中的所有文件名
+file_names = os.listdir(folder_path)
+
+for file_name in file_names:
+    if file_name.endswith(".jpg"):
+        # 构造文件的完整路径
+        file_path = os.path.join(folder_path, file_name)
+        
+        # 打开图像
+        image = Image.open(file_path)
+        
+        # 检查图像的色彩模式
+        if image.mode == "RGBA":
+            # 将图像转换为24位深度
+            image = image.convert("RGB")
+            
+            # 保存修改后的图像
+            image.save(file_path)
+            print(f"已将 {file_name} 的位深度从32改为24")
