@@ -87,5 +87,5 @@ def convert_xml_to_coco(xml_folder, labels, json_file):
 # 使用示例
 xml_folder = r'C:/Users/aa/Desktop/新建文件夹'  # 替换为实际的XML文件夹路径
 labels = ['algae', 'clean', 'color', 'floating', 'foam', 'rainbow']  # 标签列表
-json_file = 'C:/Users/aa/Desktop/coco.json'  # 替换为输出的JSON文件路径
+json_file = 'C:/Users/aa/Desktop/instances_train2017.json'  # 替换为输出的JSON文件路径
 convert_xml_to_coco(xml_folder, labels, json_file)
